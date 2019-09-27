@@ -2,5 +2,5 @@ package gotelegram
 
 //Handler handles update
 type Handler interface {
-	Handle(update Update)
+	Handle(update *Update)
 }
