@@ -19,7 +19,6 @@ func ListenAndServePolling(token string, timeout int, handler Handler) {
 	var offset = -1
 	for {
 		if resp, err := http.Get(pollingURL + "?offset=" + strconv.Itoa(offset) + "&timeout=" + strconv.Itoa(timeout)); err == nil {
-			log.Println("Update Received")
 			var result getResult
 			err = json.NewDecoder(resp.Body).Decode(&result)
 			if err != nil {
