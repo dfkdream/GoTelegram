@@ -20,12 +20,23 @@ type Update struct {
 
 //Message represents a message
 type Message struct {
-	MessageID int    `json:"message_id"`
-	From      User   `json:"from"`
-	Date      int    `json:"date"`
-	Chat      Chat   `json:"chat"`
-	Text      string `json:"text"`
+	MessageID int             `json:"message_id"`
+	From      User            `json:"from"`
+	Date      int             `json:"date"`
+	Chat      Chat            `json:"chat"`
+	Text      string          `json:"text"`
+	Entities  []MessageEntity `json:"entities"`
 	//TODO: more fields to be implemented...
+}
+
+//MessageEntity represents one special entity in a text message.
+//For example, hashtags, usernames, URLs, etc.
+type MessageEntity struct {
+	Type   string `json:"type"`
+	Offset int    `json:"offset"`
+	Length int    `json:"length"`
+	URL    string `json:"url"`
+	User   string `json:"user"`
 }
 
 //User represents a Telegram user or bot
