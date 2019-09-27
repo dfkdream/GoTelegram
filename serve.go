@@ -13,12 +13,20 @@ type getResult struct {
 	Result []Update `json:"result"`
 }
 
-//ListenAndServePolling listen updates using long polling
-func ListenAndServePolling(token string, timeout int, handler Handler) {
-	pollingURL := "https://" + path.Join("api.telegram.org/", "bot"+token, "getUpdates")
+//PollingListener is listener for long polling update
+type PollingListener struct {
+	Client  *http.Client
+	Token   string
+	Timeout int
+}
+
+//ListenAndServe listen updates using long polling
+func (p PollingListener) ListenAndServe(handler Handler) {
+	pollingURL := "https://" + path.Join("api.telegram.org/", "bot"+p.Token, "getUpdates")
+	pollingURL += "?timeout=" + strconv.Itoa(p.Timeout)
 	var offset = -1
 	for {
-		if resp, err := http.Get(pollingURL + "?offset=" + strconv.Itoa(offset) + "&timeout=" + strconv.Itoa(timeout)); err == nil {
+		if resp, err := p.Client.Get(pollingURL + "&offset=" + strconv.Itoa(offset)); err == nil {
 			var result getResult
 			err = json.NewDecoder(resp.Body).Decode(&result)
 			if err != nil {
@@ -31,7 +39,7 @@ func ListenAndServePolling(token string, timeout int, handler Handler) {
 			}
 			for _, u := range result.Result {
 				offset = u.UpdateID + 1
-				go handler.Handle(u)
+				go handler.Handle(&u)
 			}
 		} else {
 			log.Println(err)
