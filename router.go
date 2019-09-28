@@ -40,28 +40,28 @@ func (r *Router) HandleCommand(command string, handler Handler) {
 }
 
 //Handle is Mux Handler
-func (r *Router) Handle(update *Update) {
+func (r *Router) Handle(res MessageSender, update *Update) {
 	if len(update.Message.Entities) > 0 {
 		if update.Message.Entities[0].Type == "bot_command" {
 			command := update.Message.Text[:update.Message.Entities[0].Length]
 			r.mutex.RLock()
 			if h := r.handler[command]; h != nil {
 				r.mutex.RUnlock()
-				h.Handle(update)
+				h.Handle(res, update)
 			} else {
 				r.mutex.RUnlock()
 				if r.notFoundHandler != nil {
-					r.notFoundHandler.Handle(update)
+					r.notFoundHandler.Handle(res, update)
 				} else if r.defaultHandler != nil {
 					// handle message using defaultHandler
 					// if notFoundHandler is not setted up
-					r.defaultHandler.Handle(update)
+					r.defaultHandler.Handle(res, update)
 				}
 			}
 			return
 		}
 	}
 	if r.defaultHandler != nil {
-		r.defaultHandler.Handle(update)
+		r.defaultHandler.Handle(res, update)
 	}
 }

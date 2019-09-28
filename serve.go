@@ -18,13 +18,16 @@ type PollingListener struct {
 	Client  *http.Client
 	Token   string
 	Timeout int
+	r       MessageSender
 	s       chan interface{} //Channel s will be closed on shutdown
 }
 
 //NewPollingListener returns initialized polling listener
-func NewPollingListener() PollingListener {
+func NewPollingListener(token string) PollingListener {
 	return PollingListener{
-		s: make(chan interface{}),
+		s:     make(chan interface{}),
+		Token: token,
+		r:     MessageSender{token: token},
 	}
 }
 
@@ -52,7 +55,7 @@ mainLoop:
 				}
 				for _, u := range result.Result {
 					offset = u.UpdateID + 1
-					go handler.Handle(&u)
+					go handler.Handle(p.r, &u)
 				}
 			} else {
 				log.Println(err)
