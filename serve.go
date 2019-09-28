@@ -23,12 +23,12 @@ type PollingListener struct {
 }
 
 //NewPollingListener returns initialized polling listener
-func NewPollingListener(token string) PollingListener {
+func NewPollingListener(token string) (PollingListener, MessageSender) {
 	return PollingListener{
 		s:     make(chan interface{}),
 		Token: token,
 		r:     MessageSender{token: token},
-	}
+	}, MessageSender{token: token}
 }
 
 //ListenAndServe listen updates using long polling
